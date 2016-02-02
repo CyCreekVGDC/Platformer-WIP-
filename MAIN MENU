@@ -1,0 +1,968 @@
+package gui;
+import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.BorderLayout;
+import javax.swing.border.*;
+import java.io.*;
+import static java.lang.System.*;
+import java.applet.Applet;
+import java.applet.AudioClip;
+import java.net.URL;
+import javax.sound.sampled.*;
+
+public class Game_Main_Menu
+{
+	public static void main(String[] args)
+	{
+		new Environment();
+	}
+}
+
+class Environment extends View
+{
+	
+	//Playing a music file requires .WAV files.
+	public MyPanel1 gamePage;
+	public MyPanel3 settingPage;
+	public soundTest soundTestPage;
+	public MyPanel panel;
+	private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	StoryPage page;
+	int currentPage = 1;
+	public boolean PLAYINGMUSIC = false;
+	Hashtable<Integer,StoryPage> story = new Hashtable<Integer, StoryPage>();
+	public URL musicFile;
+	int tick = 0;
+	public AudioClip music;
+
+	boolean toggleMusic = true;
+	boolean toggleFull = false;
+
+	public Environment()
+	{
+		run();
+		panel = new MyPanel();
+	}
+
+	@Override
+	public void startAction()
+	{
+		music.stop();
+			if(toggleMusic)
+		{
+			PLAYINGMUSIC = false;
+		musicFile = Game_Main_Menu.class.getResource("music/Game-Village.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		}
+		System.out.println("Start new Game");
+		loadStoryPage();
+		gamePage = new MyPanel1(story.get(page.pageNumber));
+		super.setContentPane(gamePage);
+	//  gamePage.printString();
+		super.setVisible(true);
+		super.repaint();
+
+	}
+
+	@Override
+	public void continueAction()
+	{
+		System.out.println("Continue Game");
+	}
+
+	@Override
+	public void optionsAction()
+	{
+		if(toggleMusic && !PLAYINGMUSIC)
+		{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-Village.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		}
+		System.out.println("Change Settings");
+		settingPage = new MyPanel3();
+		super.setContentPane(settingPage);
+	// gamePage.printString();
+		super.setVisible(true);
+		super.repaint();
+	}
+
+	@Override
+	public void exitAction()
+	{
+		System.out.println("Save & Exit");
+		pause(10);
+		music.stop();
+		System.exit(0);
+	}
+
+	@Override
+	public void run()
+	{
+
+		if(toggleMusic && !PLAYINGMUSIC)
+		{
+		musicFile = Game_Main_Menu.class.getResource("music/Game-NotSure.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		}
+	//	loadStoryPages();
+	}
+
+	@Override
+	public void exitGameAction()
+	{
+		System.out.println("Exit to Main Menu");
+		super.setContentPane(panel);
+		super.setVisible(true);
+		super.repaint();
+			music.stop();
+			run();
+	}
+
+	@Override
+	public void exitGameActionSet()
+	{
+		System.out.println("Exit to Main Menu");
+		super.setContentPane(panel);
+		super.setVisible(true);
+		super.repaint();
+		if(!PLAYINGMUSIC)
+		{
+			music.stop();
+		}
+			run();
+	}
+
+	@Override
+	public void exitGameActionSound()
+	{
+		System.out.println("Exit to Options");
+		super.setContentPane(panel);
+		super.setVisible(true);
+		super.repaint();
+		 optionsAction();
+	}
+
+	void loadStoryPage()
+	{
+		try{
+			Scanner scan = new Scanner(new File("test01.dat"));
+			while(scan.hasNext())
+			{
+				page = new StoryPage(scan.nextLine());
+				story.put((int)(page.pageNumber),page);
+			}
+			page = story.get(currentPage);
+
+		}catch(FileNotFoundException e){}
+
+	}
+
+	void nextPage()
+	{
+		try{
+		currentPage++;
+		story.get(currentPage);
+		MyPanel1 gamePage = new MyPanel1(story.get(currentPage));
+		super.setContentPane(gamePage);
+		setVisible(true);
+		repaint();
+		}
+		catch(Exception e){out.println("Accessed nonexistent page");}
+	}
+
+	void previousPage()
+	{
+		try{
+
+		currentPage--;
+		story.get(currentPage);
+		MyPanel1 gamePage = new MyPanel1(story.get(currentPage));
+		super.setContentPane(gamePage);
+		setVisible(true);
+		repaint();
+		}
+		catch(Exception e){out.println("Accessed nonexistent page");}
+	}
+
+	@Override
+	public void buttonOneAction()
+	{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-Fight!.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+	}
+	@Override
+	public void buttonTwoAction()
+	{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-Village.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+	}
+	@Override
+	public void buttonThreeAction()
+	{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-UprisingConflict.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+	}
+// OPTION SETTINGS *****************************************
+	@Override
+	public void setting1Action()
+	{
+		if(toggleFull == false)
+		{
+		super.setSize(screenSize.width,screenSize.height);	
+		super.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+		super.repaint();
+		toggleFull = true;
+		}
+		else
+		{
+				setSize(1000,715);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(3);
+		toggleFull = false;
+		}
+		
+		out.println("OPTION 1 OF SETTINGS");
+	}
+
+		@Override
+	public void setting2Action()
+	{
+	/*	music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-Fight!.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();*/
+		out.println("OPTION 2 OF SETTINGS");
+	}
+// TOGGLE MUSIC ON/OFF METHOD
+	@Override
+	public void setting3Action()
+	{
+		if(toggleMusic)
+		{
+		music.stop();
+		toggleMusic = false;
+		out.println("NO SOUND !!!");
+		}
+		else
+		{
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		out.println("SOUND OK !!!");
+		toggleMusic = true;
+		}
+	}
+
+	@Override
+	public void setting4Action()
+	{
+		if(!toggleMusic && PLAYINGMUSIC)
+		{
+		music.stop();
+		}
+		if(toggleMusic && !PLAYINGMUSIC)
+		{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-Village.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		}
+		soundTestPage = new soundTest();
+		super.setContentPane(soundTestPage);
+		super.setVisible(true);
+		super.repaint();
+		out.println("SOUND TEST");
+	}
+// SOUND TEST OPTIONS ************************
+   	@Override
+	public void sound1Action()
+	{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-NotSure.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		PLAYINGMUSIC = true;
+		out.println("Game - Not Sure");
+	}
+
+		@Override
+	public void sound2Action()
+	{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-Village.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		PLAYINGMUSIC = true;
+		out.println("Game - Village");
+	}
+
+			@Override
+	public void sound3Action()
+	{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-Fight!.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		PLAYINGMUSIC = true;
+		out.println("Game - Fight!");
+	}
+
+			@Override
+	public void sound4Action()
+	{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-UprisingConflict.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		PLAYINGMUSIC = true;
+		out.println("Game  - Uprising Conflict");
+	}
+
+			@Override
+	public void sound5Action()
+	{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Game-UprisingConflictFast.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		PLAYINGMUSIC = true;
+		out.println("Game - Uprising Conflict Fast");
+	}
+
+			@Override
+	public void sound6Action()
+	{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Bayonetta-FlyMeToTheMoonClimax.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		PLAYINGMUSIC = true;
+		out.println("Bayonetta - Fly Me To The Moon Cover");
+	}
+
+			@Override
+	public void sound7Action()
+	{
+		music.stop();
+		musicFile = Game_Main_Menu.class.getResource("music/Catherine-It's_a_Golden_Show.wav");
+		music  = Applet.newAudioClip(musicFile);
+		music.loop();
+		PLAYINGMUSIC = true;
+		out.println("Catherine - It's a Golden Show");
+	}
+	@Override
+		public void nextButtonAction()
+	{
+			nextPage();
+		}
+
+	@Override
+	public void previousButtonAction()
+	{
+		previousPage();
+
+		}
+
+
+}
+
+class View extends JFrame
+{
+	JButton start, settings, continues, exit;
+	JButton op1, op2, op3, op4, op5;
+	JButton sound1, sound2, sound3, sound4,sound5,sound6,sound7, soundExit;
+	JTextArea output;
+	JButton   buttonOne, buttonTwo, buttonThree, buttonFour , nextButton, previousButton;
+	JTextField input;
+
+	public View()
+	{
+		setSize(1000,715);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(3);
+		setContentPane(new MyPanel());
+		setParams();
+		setResizable(false);
+		setVisible(true);
+		setTitle("Text Based Game with Visuals - Main Menu");
+		run();
+	}
+
+	class MyPanel extends JPanel
+	{
+		MyPanel()
+		{
+			setLayout(null);
+
+			start = new JButton();
+			start.setPreferredSize(new Dimension(130,25));
+			start.setSize(150,30);
+			start.setLocation(415,270);
+			//start.setBorder(new LineBorder(Color.BLACK,0));
+			start.setFocusable(false);
+			start.setText("Start");
+			start.addActionListener(new ActionStartListener());
+			add(start);
+
+			continues = new JButton();
+			continues.setPreferredSize(new Dimension(130,25));
+			continues.setSize(150,30);
+			continues.setLocation(415,310);
+			//continues.setBorder(new LineBorder(Color.BLACK,0));
+			continues.setFocusable(false);
+			continues.setText("Continue");
+			continues.addActionListener(new ActionContinueListener());
+			add(continues);
+
+			settings = new JButton();
+			settings.setPreferredSize(new Dimension(130,25));
+			settings.setSize(150,30);
+			settings.setLocation(415,350);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			settings.setFocusable(false);
+			settings.setText("Settings");
+			settings.addActionListener(new ActionOptionsListener());
+			add(settings);
+
+			exit = new JButton();
+			exit.setPreferredSize(new Dimension(130,25));
+			exit.setSize(150,30);
+			exit.setLocation(415,390);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			exit.setFocusable(false);
+			exit.setText("Exit");
+			exit.addActionListener(new ActionExitListener());
+			add(exit);
+
+		}
+	}
+
+	class MyPanel1 extends JPanel
+	{
+		StoryPage page;
+		String all = "";
+		ImageIcon storyPic;
+
+		MyPanel1(StoryPage p)
+		{
+			page = p;
+   			//setBackground(new Color(181,179,92));
+			setLayout(null);
+			output = new JTextArea();
+				output.setFont( new java.awt.Font("DialogInput", 0, 12));
+				output.setEditable(false);
+				output.setFocusable(false);
+			JScrollPane scroll = new JScrollPane(output);
+				scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				scroll.setSize(980,150);
+				scroll.setLocation(7,350);
+			add(scroll);
+
+			buttonOne = new JButton();
+				buttonOne.setPreferredSize(new Dimension(130,25));
+				buttonOne.addActionListener( new ActionOneListener() );
+				buttonOne.setSize(150,30);
+				buttonOne.setLocation(815,525);
+			add(buttonOne);
+
+			buttonTwo = new JButton();
+				buttonTwo.setPreferredSize(new Dimension(130,25));
+				buttonTwo.addActionListener( new ActionTwoListener() );
+				buttonTwo.setSize(150,30);
+				buttonTwo.setLocation(815,560);
+			add(buttonTwo);
+
+			buttonThree = new JButton();
+				buttonThree.setPreferredSize(new Dimension(130,25));
+				buttonThree.addActionListener( new ActionThreeListener() );
+				buttonThree.setSize(150,30);
+				buttonThree.setLocation(815,595);
+			add(buttonThree);
+
+			buttonFour = new JButton();
+				buttonFour.setPreferredSize(new Dimension(130,25));
+				buttonFour.addActionListener( new ExitActionListener() );
+				buttonFour.setSize(150,30);
+				buttonFour.setLocation(815,630);
+				buttonFour.setText("Exit");
+			add(buttonFour);
+
+			nextButton = new JButton();
+				nextButton.setPreferredSize(new Dimension(130,25));
+				nextButton.addActionListener( new nextButtonActionListener() );
+				nextButton.setSize(250,100);
+				nextButton.setLocation(450,570);
+				nextButton.setFont(new Font("Arial",1,30));
+				nextButton.setText("Next");
+			add(nextButton);
+
+			previousButton = new JButton();
+				previousButton.setPreferredSize(new Dimension(130,25));
+				previousButton.addActionListener( new previousButtonActionListener() );
+				previousButton.setSize(250,100);
+				previousButton.setLocation(120,570);
+				previousButton.setFont(new Font("Arial",1,30));
+				previousButton.setText("Previous");
+			add(previousButton);
+
+			int count = 0;
+
+		try{
+			Scanner scan = new Scanner(new File(page.choicesFileName));
+            		while(scan.hasNext())
+            		{
+            		count++;
+            		scan.nextLine();
+            		}
+            		}
+            	catch(Exception e){out.println(e);}
+
+		try{
+
+            Scanner scan = new Scanner(new File(page.choicesFileName));
+
+					if(count==3)
+            		{
+            			buttonOne.setText(scan.nextLine());
+            			buttonTwo.setText(scan.nextLine());
+            			buttonThree.setText(scan.nextLine());
+            		}
+            		else
+            			if(count==2)
+            			{
+            				buttonOne.setText(scan.nextLine());
+            				buttonTwo.setText(scan.nextLine());
+            			}
+            			else
+            				if(count==1)
+            					buttonOne.setText(scan.nextLine());
+            	}
+            	catch(Exception e){out.println(e);}
+
+
+		}
+            public void paintComponent(Graphics g)
+            {
+
+				storyPic =  new ImageIcon(page.imageFileName);
+            	g.drawImage( storyPic.getImage(), 0, 0, null );
+
+
+            	try{
+            		Scanner scan = new Scanner(new File(page.textFileName));
+            		while(scan.hasNextLine())
+            		{
+            			String thing = scan.nextLine();
+            			output.append(thing + "\n");
+            			all+= thing + "\n";
+            		}
+
+            	}
+            	catch(FileNotFoundException e){out.println(e);}
+
+				//load = true;
+            }
+
+
+	}
+
+	class ActionOneListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			buttonOneAction();
+	}}
+
+	class ActionTwoListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			buttonTwoAction();
+	}}
+
+	class ActionThreeListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			buttonThreeAction();
+	}}
+
+	class nextButtonActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			nextButtonAction();
+	}}
+
+		class previousButtonActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			previousButtonAction();
+	}}
+
+	public void buttonOneAction()
+	{
+
+	}
+
+	public void buttonTwoAction()
+	{
+
+
+		}
+
+	public void buttonThreeAction()
+	{
+
+
+		}
+
+		public void nextButtonAction()
+	{
+
+		}
+
+	public void previousButtonAction()
+	{
+
+
+		}
+
+
+
+	class InputFieldActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			inputFieldAction();
+	}}
+
+	public void inputFieldAction()
+	{}
+
+	class ExitActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			exitGameAction();
+	}}
+
+		class ExitActionListenerOp implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			exitGameActionSet();
+	}}
+		class ExitActionListenerSound implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			exitGameActionSound();
+	}}
+
+	public void exitGameAction()
+	{}
+
+	public void exitGameActionSet()
+	{}
+	public void exitGameActionSound()
+	{}
+
+	class Option1Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			setting1Action();
+	}}
+
+	class Option2Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			setting2Action();
+	}}
+
+	class Option3Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			setting3Action();
+	}}
+
+	class Option4Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			setting4Action();
+	}}
+
+	public void setting1Action()
+	{}
+
+	public void setting2Action()
+	{}
+
+	public void setting3Action()
+	{}
+
+	public void setting4Action()
+	{}
+
+	class Sound1Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			sound1Action();
+	}}
+
+	class Sound2Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			sound2Action();
+	}}
+		class Sound3Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			sound3Action();
+	}}
+		class Sound4Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			sound4Action();
+	}}
+		class Sound5Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			sound5Action();
+	}}
+		class Sound6Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			sound6Action();
+	}}
+		class Sound7Listener implements ActionListener {
+	public void actionPerformed(ActionEvent event) {
+			sound7Action();
+	}}
+	public void sound1Action()
+	{}
+	public void sound2Action()
+	{}
+	public void sound3Action()
+	{}
+	public void sound4Action()
+	{}
+	public void sound5Action()
+	{}
+	public void sound6Action()
+	{}
+	public void sound7Action()
+	{}
+
+	class ActionStartListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			startAction();
+	}}
+
+	public void startAction()
+	{}
+
+	class ActionContinueListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			continueAction();
+	}}
+
+	public void continueAction()
+	{}
+
+	class ActionOptionsListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			optionsAction();
+	}}
+
+	public void optionsAction()
+	{}
+
+	class ActionExitListener implements ActionListener {
+		public void actionPerformed(ActionEvent event) {
+			exitAction();
+	}}
+
+	public void exitAction()
+	{}
+
+	public void	setParams()
+	{}
+
+	public void run()
+	{}
+
+	public void pause(double sec)
+	{
+		try {
+		    Thread.sleep((int)(100*sec));
+		} catch(InterruptedException ex) {
+		    Thread.currentThread().interrupt();
+		}
+	}
+	//OPTION MENU **************************************
+	class MyPanel3 extends JPanel
+	{
+		MyPanel3()
+		{
+			setLayout(null);
+			op1 = new JButton();
+			op1.setPreferredSize(new Dimension(130,25));
+			op1.setSize(250,30);
+			op1.setLocation(360,270);
+			//start.setBorder(new LineBorder(Color.BLACK,0));
+			op1.setFocusable(false);
+			op1.setText("SCREEN RESOLUTION");
+			op1.addActionListener(new Option1Listener());
+			add(op1);
+
+			op2 = new JButton();
+			op2.setPreferredSize(new Dimension(130,25));
+			op2.setSize(250,30);
+			op2.setLocation(360,310);
+			//continues.setBorder(new LineBorder(Color.BLACK,0));
+			op2.setFocusable(false);
+			op2.setText("SOUND SETTINGS");
+			op2.addActionListener(new Option2Listener());
+			add(op2);
+
+			op3 = new JButton();
+			op3.setPreferredSize(new Dimension(130,25));
+			op3.setSize(250,30);
+			op3.setLocation(360,350);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			op3.setFocusable(false);
+			op3.setText("TOGGLE MUSIC ON/OFF");
+			op3.addActionListener(new Option3Listener());
+			add(op3);
+
+			op4 = new JButton();
+			op4.setPreferredSize(new Dimension(130,25));
+			op4.setSize(250,30);
+			op4.setLocation(360,390);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			op4.setFocusable(false);
+			op4.setText("TITLE SCREEN MUSIC");
+			op4.addActionListener(new Option4Listener());
+			add(op4);
+
+			op5 = new JButton();
+			op5.setPreferredSize(new Dimension(130,25));
+			op5.setSize(150,30);
+			op5.setLocation(415,430);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			op5.setFocusable(false);
+			op5.setText("EXIT TO MENU");
+			op5.addActionListener(new ExitActionListenerOp());
+			add(op5);
+
+		}
+	}
+	//SOUND TEST *************************************
+	class soundTest extends JPanel
+	{
+		soundTest()
+		{
+			setLayout(null);
+			sound1 = new JButton();
+			sound1.setPreferredSize(new Dimension(130,25));
+			sound1.setSize(250,30);
+			sound1.setLocation(360,210);
+			//start.setBorder(new LineBorder(Color.BLACK,0));
+			sound1.setFocusable(false);
+			sound1.setText("Game - Title");
+			sound1.addActionListener(new Sound1Listener());
+			add(sound1);
+
+			sound2 = new JButton();
+			sound2.setPreferredSize(new Dimension(130,25));
+			sound2.setSize(250,30);
+			sound2.setLocation(360,240);
+			//continues.setBorder(new LineBorder(Color.BLACK,0));
+			sound2.setFocusable(false);
+			sound2.setText("Game - Village");
+			sound2.addActionListener(new Sound2Listener());
+			add(sound2);
+
+			sound3 = new JButton();
+			sound3.setPreferredSize(new Dimension(130,25));
+			sound3.setSize(250,30);
+			sound3.setLocation(360,270);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			sound3.setFocusable(false);
+			sound3.setText("Game - Fight!");
+			sound3.addActionListener(new Sound3Listener());
+			add(sound3);
+
+			sound4 = new JButton();
+			sound4.setPreferredSize(new Dimension(130,25));
+			sound4.setSize(250,30);
+			sound4.setLocation(360,300);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			sound4.setFocusable(false);
+			sound4.setText("Game - Uprising Conflict");
+			sound4.addActionListener(new Sound4Listener());
+			add(sound4);
+
+			sound5 = new JButton();
+			sound5.setPreferredSize(new Dimension(130,25));
+			sound5.setSize(250,30);
+			sound5.setLocation(360,330);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			sound5.setFocusable(false);
+			sound5.setText("Game - Uprising Conflict Fast");
+			sound5.addActionListener(new Sound5Listener());
+			add(sound5);
+
+			sound6 = new JButton();
+			sound6.setPreferredSize(new Dimension(130,25));
+			sound6.setSize(250,30);
+			sound6.setLocation(360,360);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			sound6.setFocusable(false);
+			sound6.setText("PLACEHOLDER: Bayonetta-Fly me to the Moon");
+			sound6.addActionListener(new Sound6Listener());
+			add(sound6);
+
+			sound7 = new JButton();
+			sound7.setPreferredSize(new Dimension(130,25));
+			sound7.setSize(250,30);
+			sound7.setLocation(360,390);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			sound7.setFocusable(false);
+			sound7.setText("PLACEHOLDER: Catherine - It's a Golden Show");
+			sound7.addActionListener(new Sound7Listener());
+			add(sound7);
+
+			soundExit = new JButton();
+			soundExit.setPreferredSize(new Dimension(130,25));
+			soundExit.setSize(150,30);
+			soundExit.setLocation(415,430);
+			//settings.setBorder(new LineBorder(Color.BLACK,0));
+			soundExit.setFocusable(false);
+			soundExit.setText("EXIT TO MENU");
+			soundExit.addActionListener(new ExitActionListenerSound());
+			add(soundExit);
+
+		}
+	}
+
+
+}
+
+
+
+class StoryPage
+{
+	String imageFileName;
+	String textFileName;
+	String choicesFileName;
+//	String audioFileName;
+	int pageNumber;
+
+	public StoryPage(String filename)
+	{
+		try{
+			Scanner fileScan = new Scanner(new File(filename));
+			imageFileName = fileScan.nextLine();
+			textFileName = fileScan.nextLine();
+			choicesFileName = fileScan.nextLine();
+		//	audioFileName = fileScan.nextLine();
+			pageNumber = Integer.valueOf(fileScan.nextLine());
+
+				}
+		catch(FileNotFoundException e){out.println(e);}
+
+
+	}
+
+
+
+
+}
+
+
