@@ -1,0 +1,215 @@
+package files;
+
+import static java.lang.System.*;
+import java.io.*;
+import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.Timer;
+
+public class Lvl_Gen
+{
+	public static void main(String[] args)
+	{
+		new World("level.lvl");
+	}
+}
+
+class World extends JFrame
+{
+	public World(String lvl_file)
+	{
+		setSize(800, 576);
+		setLocationRelativeTo(null);
+		setContentPane(new Level(lvl_file));
+		setVisible(true);
+	}
+
+	class Level extends JPanel
+	{
+		int tileSize = 0;
+		Integer[][] map;
+		int lvlLength;
+		Rectangle play;
+
+		MyKeyListener listen = new MyKeyListener();
+
+		public Level(String lvl)
+		{
+			try
+			{
+				new Timer(20, new Checker()).start();
+				
+				Scanner lvlScanner = new Scanner(new File(lvl));
+				lvlLength = Integer.valueOf(lvlScanner.nextLine());
+
+				map = new Integer[lvlLength][17];
+
+				for(int y = 0; y < 17; y++)
+				{
+					for(int x = 0; x < lvlLength; x++)
+					{
+						map[x][y] = Integer.valueOf(lvlScanner.next());
+					}
+				}
+
+				/*for(int y = 0; y < 17; y++)
+				{
+					for(int x = 0; x < lvlLength; x++)
+					{
+						out.print(map[x][y]);
+					}
+					out.println();
+				}*/
+			}
+			catch(Exception e){out.println(e);}
+
+			play = new Rectangle(300,200, 32,64);
+
+			setFocusable(true);
+			addKeyListener(listen);
+		}
+
+		public void paintComponent(Graphics g)
+		{
+			Graphics2D g2 = (Graphics2D)g;
+
+			tileSize = 32;
+			int tileSpacer = 32;
+			int tilePosX = 0;
+			int tilePosY = -32;
+
+			for(Integer[] line: map)
+			{
+				for(Integer data: line)
+				{
+					switch(data)
+					{
+						case 0: g2.setColor(Color.WHITE); g2.fillRect(tilePosY,tilePosX,tileSize,tileSize); break;
+						case 1: g2.setColor(Color.BLACK); g2.fillRect(tilePosY,tilePosX,tileSize,tileSize); break;
+						case 2: g2.setColor(Color.BLUE); g2.fillRect(tilePosY,tilePosX,tileSize,tileSize); break;
+						case 3: g2.setColor(Color.RED); g2.fillRect(tilePosY,tilePosX,tileSize,tileSize); break;
+						case 5: g2.setColor(Color.GREEN); g2.fillRect(tilePosY, tilePosX,tileSize,tileSize); break;
+					}
+					tilePosX+=32;
+				}
+				tilePosY+=32;
+				tilePosX=0;
+			}
+
+			g2.setColor(Color.GREEN);
+			g2.fill(play);
+		}
+
+		class MyKeyListener implements KeyListener
+		{
+			HashSet<Integer> pressedKeys;
+
+			public MyKeyListener()
+			{
+				pressedKeys = new HashSet<Integer>();
+			}
+
+			@Override
+			public void keyTyped(KeyEvent e){}
+
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+				int keyCode = e.getKeyCode();
+	        	pressedKeys.add(keyCode);
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				int keyCode = e.getKeyCode();
+	        	pressedKeys.remove(keyCode);
+			}
+		}
+
+		class Checker implements ActionListener
+		{
+			int rate = 1;
+			boolean gravity = true;
+			int gravDown = 2;
+			int frame = 1;
+			int upSpd = 3;
+			boolean jumping = false;
+
+			@Override
+			public void actionPerformed(ActionEvent eve)
+			{
+	       		int input = 0;
+
+	       		try
+	       		{
+	       			if(!listen.pressedKeys.isEmpty())
+	           	    {
+	    	            Iterator<Integer> i = listen.pressedKeys.iterator();
+
+	    	         	while(i.hasNext())
+	    	         	{
+	    	         		input = Integer.valueOf(i.next());
+
+							switch(input)
+							{
+								case 87: if(jumping != true){jumping = true;} break;
+								case 65: if(!((play.x-1) < 0)){play.x-=rate;} break;
+								case 68: if(!((play.x+1) > ((lvlLength*32)-(tileSize*2)))){play.x+=rate;} break;
+								case 37: if(!((play.x-1) < 0)){play.x-=rate;} break;
+								case 38: if(jumping != true){jumping = true;} break;
+								case 39: if(!((play.x+1) > ((lvlLength*32)-(tileSize*2)))){play.x+=rate;} break;
+							}
+
+							out.println(input);
+	    	            }
+
+	    	            rate = 7;
+	               }
+	               
+	               frame--;
+	               
+	               if(gravity == true && (!((play.y + 2) > 500)) && frame <= 0)
+	       		   {
+	       		   	   play.y+=gravDown;
+	       		   	   frame = 1;
+	       		   }
+	       		   
+	       		   repaint();
+	       		}
+	       		catch(Exception e){e.printStackTrace();}
+	       		
+	       		
+	        }
+		}
+	}
+
+	/*abstract class Tile
+	{
+		public Tile()
+		{
+
+		}
+
+		abstract void getColor();
+	}
+
+	class Space_Tile extends Tile
+	{
+		public Space_Tile()
+		{
+
+		}
+	}
+
+	class Platform_Tile extends Tile
+	{
+		public Platform_Tile()
+		{
+
+		}
+	}*/
+
+}
