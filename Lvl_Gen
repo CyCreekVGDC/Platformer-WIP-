@@ -1,3 +1,4 @@
+
 package files;
 
 import static java.lang.System.*;
@@ -7,12 +8,14 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
+import javafx.geometry.BoundingBox;
 
-public class Lvl_Gen
+
+public class Blocks
 {
 	public static void main(String[] args)
 	{
-		new World("level.lvl");
+		new World("lvl.txt");
 	}
 }
 
@@ -31,7 +34,7 @@ class World extends JFrame
 		int tileSize = 0;
 		Integer[][] map;
 		int lvlLength;
-		Rectangle play;
+		Sprite play;
 
 		MyKeyListener listen = new MyKeyListener();
 
@@ -65,7 +68,7 @@ class World extends JFrame
 			}
 			catch(Exception e){out.println(e);}
 
-			play = new Rectangle(300,200, 32,64);
+			play = new Sprite(300,200, 32,64);
 
 			setFocusable(true);
 			addKeyListener(listen);
@@ -137,6 +140,7 @@ class World extends JFrame
 			int frame = 1;
 			int upSpd = 3;
 			boolean jumping = false;
+			
 
 			@Override
 			public void actionPerformed(ActionEvent eve)
@@ -171,6 +175,8 @@ class World extends JFrame
 	               
 	               frame--;
 	               
+	               
+	               
 	               if(gravity == true && (!((play.y + 2) > 500)) && frame <= 0)
 	       		   {
 	       		   	   play.y+=gravDown;
@@ -185,22 +191,60 @@ class World extends JFrame
 	        }
 		}
 	}
-
-	/*abstract class Tile
+	
+	class Sprite extends Rectangle
 	{
-		public Tile()
+		private BoundingBox box;
+		int x=0, posY=0;
+	
+		public Sprite(int rtx, int y, int a,int b)
 		{
+			x = rtx;
+			posY=y;
+			box	= new BoundingBox(x,y+64,32,1);
+		}
+		
+		public void setPos(int x ,int y){box	= new BoundingBox(x,y+64,32,1);}
+		
+		public BoundingBox getBox(){return box;}
+		
+		public void moveX(int r)
+		{
+			x+=r;
+			setPos(x,posY);
+			
+		}
+		
+		public void moveY(int r)
+		{
+			posY+=r;
+			setPos(x,posY);
+		}
+		
 
+	}
+	
+
+ 	abstract class Tile extends BoundingBox
+	{
+		
+		public Tile(int posx, int posy)
+		{
+			super(posx, posy,32,32);
 		}
 
 		abstract void getColor();
 	}
 
-	class Space_Tile extends Tile
+/*	class Space_Tile extends Tile
 	{
 		public Space_Tile()
 		{
-
+			
+		}
+		void getColor()
+		{
+			
 		}
 	}
 
@@ -208,8 +252,14 @@ class World extends JFrame
 	{
 		public Platform_Tile()
 		{
-
+	
 		}
-	}*/
-
+		
+		void getColor()
+		{
+			
+		}
+	}
+*/
 }
+
